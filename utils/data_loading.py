@@ -232,14 +232,13 @@ def load_graph_data(training_config, device):
         dataset_extract_path = os.path.join(DATA_PATH, 'home_network')
 
         # Unzip the dataset if it hasn't been unzipped already
-        if not os.path.exists(dataset_extract_path):
-            with zipfile.ZipFile(dataset_zip_path, 'r') as zip_ref:
-                zip_ref.extractall(DATA_PATH)
-            print(f'Unzipped dataset to {dataset_extract_path}')
+        if not os.path.exists(HOME_NETWORK_PATH):
+            with zipfile.ZipFile(HOME_NETWORK_ZIP_PATH, 'r') as zip_ref:
+                zip_ref.extractall(DATA_DIR_PATH)
+            print(f'Unzipped dataset to {HOME_NETWORK_PATH}')
 
         # Load the dataset
-        dataset_csv_path = os.path.join(dataset_extract_path, 'home_network_data.csv')
-        dataset = pd.read_csv(dataset_csv_path)
+        dataset = pd.read_csv(HOME_NETWORK_CSV_PATH)
 
         # Preprocess node features
         node_features = dataset[['duration', 'protocol_type', 'service', 'flag', 'src_bytes', 'dst_bytes']].values

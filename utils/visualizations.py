@@ -7,6 +7,8 @@ import igraph as ig
 from utils.constants import DatasetType, GraphVisualizationTool, network_repository_cora_url, cora_label_to_color_map
 from utils.utils import convert_adj_to_edge_index
 
+# Define a color map for the home network dataset if needed
+home_network_label_to_color_map = {0: "red", 1: "blue"}  # Example color map for binary classification
 
 def plot_in_out_degree_distributions(edge_index, num_of_nodes, dataset_name):
     """
@@ -118,6 +120,9 @@ def visualize_graph(edge_index, node_labels, dataset_name, visualization_tool=Gr
         # This is the only part that's Cora specific as Cora has 7 labels
         if dataset_name.lower() == DatasetType.CORA.name.lower():
             visual_style["vertex_color"] = [cora_label_to_color_map[label] for label in node_labels]
+        #ADDED
+        elif dataset_name.lower() == DatasetType.HOME_NETWORK.name.lower():
+            visual_style["vertex_color"] = [home_network_label_to_color_map[label] for label in node_labels]
         else:
             print('Feel free to add custom color scheme for your specific dataset. Using igraph default coloring.')
 
@@ -141,4 +146,5 @@ def draw_entropy_histogram(entropy_array, title, color='blue', uniform_distribut
     plt.xlabel(f'entropy bins')
     plt.ylabel(f'# of node neighborhoods')
     plt.title(title)
+    plt.show()
 

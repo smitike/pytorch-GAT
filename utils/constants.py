@@ -12,6 +12,7 @@ from torch.utils.tensorboard import SummaryWriter
 class DatasetType(enum.Enum):
     CORA = 0,
     PPI = 1
+    HOME_NETWORK = 2  # Added Home Network dataset
 
 
 # Networkx is not precisely made with drawing as it's main feature but I experimented with it a bit
@@ -86,6 +87,16 @@ PPI_URL = 'https://data.dgl.ai/dataset/ppi.zip'  # preprocessed PPI data from De
 PPI_NUM_INPUT_FEATURES = 50
 PPI_NUM_CLASSES = 121
 
+#
+# Home Network specific information
+#
+
+HOME_NETWORK_PATH = os.path.join(DATA_DIR_PATH, 'home_network')
+HOME_NETWORK_ZIP_PATH = os.path.join(DATA_DIR_PATH, 'home_network.zip')
+HOME_NETWORK_CSV_PATH = os.path.join(HOME_NETWORK_PATH, 'home_network_data.csv')
+
+HOME_NETWORK_NUM_INPUT_FEATURES = 6  # duration, protocol_type, service, flag, src_bytes, dst_bytes
+HOME_NETWORK_NUM_CLASSES = 2  # Assuming binary classification for attack or not
 
 
 

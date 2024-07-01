@@ -53,6 +53,7 @@ from torch.utils.data import DataLoader, Dataset
 from utils.constants import *
 from utils.visualizations import plot_in_out_degree_distributions, visualize_graph
 
+import pandas as pd  # Add pandas for reading CSV
 
 def load_graph_data(training_config, device):
     dataset_name = training_config['dataset_name'].lower()
@@ -223,6 +224,47 @@ def load_graph_data(training_config, device):
             )
 
             return data_loader_train, data_loader_val, data_loader_test
+
+    elif dataset_name == 'home_network':  # New condition for your dataset
+
+        # Define paths
+        dataset_zip_path = os.path.join(DATA_PATH, 'home_network.zip')
+        dataset_extract_path = os.path.join(DATA_PATH, 'home_network')
+
+        # Unzip the dataset if it hasn't been unzipped already
+        if not os.path.exists(dataset_extract_path):
+            with zipfile.ZipFile(dataset_zip_path, 'r') as zip_ref:
+                zip_ref.extractall(DATA_PATH)
+            print(f'Unzipped dataset to {dataset_extract_path}')
+
+        # Load the dataset
+        dataset_csv_path = os.path.join(dataset_extract_path, 'home_network_data.csv')
+        dataset = pd.read_csv(dataset_csv_path)
+
+        # Preprocess node features
+        node_features = dataset[['duration', 'protocol_type', 'service', 'flag', 'src_bytes', 'dst_bytes']].values
+        node_features = torch.tensor(node_features, dtype=torch.float).to(device)
+
+        # Encode labels
+        label_encoder = LabelEncoder()
+        node_labels = label_encoder.fit_transform(dataset['attack'])
+        node_labels = torch.tensor(node_labels, dtype=torch.long).to(device)
+
+        # Create a dummy edge_index for now
+        num_nodes = node_features.shape[0]
+        edge_index = torch.tensor(np.vstack([np.arange(num_nodes), np.arange(num_nodes)]), dtype=torch.long).to(device)
+
+        # Split indices for training, validation, and test
+        indices = np.arange(num_nodes)
+        np.random.shuffle(indices)
+        train_size = int(0.6 * num_nodes)
+        val_size = int(0.2 * num_nodes)
+
+        train_indices = torch.tensor(indices[:train_size], dtype=torch.long).to(device)
+        val_indices = torch.tensor(indices[train_size:train_size+val_size], dtype=torch.long).to(device)
+        test_indices = torch.tensor(indices[train_size+val_size:], dtype=torch.long).to(device)
+
+        return node_features, node_labels, edge_index, train_indices, val_indices, test_indices
     else:
         raise Exception(f'{dataset_name} not yet supported.')
 
